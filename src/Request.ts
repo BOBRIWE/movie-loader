@@ -23,8 +23,6 @@ export default class Request {
         throw new Error(fetchRequest.statusText);
       }
 
-
-      const json = await fetchRequest.json();
-      return json;
+      return fetchRequest.json();
     }
 }

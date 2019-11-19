@@ -2,6 +2,7 @@ import QueryString from 'query-string';
 import Request from '@/Request';
 import IPagedResponse from '@/MovieDBApi/IPagedResponse';
 import IDiscoverQuery from '@/MovieDBApi/IDiscoverQuery';
+import IGenresResponse from '@/MovieDBApi/IGenresResponse';
 
 export default class MovieDBApi {
   static async getNowPlaying(): Promise<IPagedResponse> {
@@ -27,5 +28,10 @@ export default class MovieDBApi {
   static async discoverMovie(query: IDiscoverQuery): Promise<IPagedResponse> {
     const request = new Request(`/discover/movie/?${QueryString.stringify(query)}`);
     return request.get<IPagedResponse>();
+  }
+
+  static async getGenres(): Promise<IGenresResponse> {
+    const request = new Request('/genre/movie/list');
+    return request.get<IGenresResponse>();
   }
 }

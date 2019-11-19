@@ -1,6 +1,16 @@
 <template>
   <section class="movies-list">
-    <MoviesListCard v-for="movie in movies" v-bind:key="`card-${movie.id}`" v-bind:movie="movie" />
+    <header class="movies-list__header">
+      <YearFilter @onYearSelected="onYearChanged"/>
+      <GenresFilter @onGenresChanged="onGenresChanged"/>
+    </header>
+    <main class="movies-list__main">
+      <MoviesListCard
+        v-for="movie in movies"
+        v-bind:key="`card-${movie.id}`"
+        v-bind:movie="movie"
+      />
+    </main>
   </section>
 </template>
 
@@ -15,35 +25,61 @@ import IMovie from '../MovieDBApi/IMovie';
 import MoviesListCard from '@/components/MoviesListCard.vue';
 import MovieDBApi from '@/MovieDBApi/MovieDBApi';
 import IPagedResponse from '@/MovieDBApi/IPagedResponse';
+import YearFilter from '@/components/YearFilter.vue';
+import IDiscoverQuery from '@/MovieDBApi/IDiscoverQuery';
+import GenresFilter from '@/components/GenresFilter.vue';
 @Component({
-  components: { MoviesListCard },
+  components: { GenresFilter, YearFilter, MoviesListCard },
 })
 export default class MoviesList extends Vue {
   private movies: IMovie[] = [];
 
-  async created() {
-    await this.updateMoviesList();
+  private queryObj: IDiscoverQuery = {};
+
+  created() {
+    this.updateMoviesList(this.queryObj);
   }
 
-  async updateMoviesList() {
-    try {
-      const discoverMoviesRequest = await MovieDBApi.discoverMovie({
-        with_genres: '28',
+  onYearChanged(newYear: string) {
+    this.queryObj.year = parseInt(newYear, 10);
+    this.updateMoviesList(this.queryObj);
+  }
+
+  onGenresChanged(genresIds: number[]) {
+    this.queryObj.with_genres = genresIds.join('&');
+    this.updateMoviesList(this.queryObj);
+  }
+
+  updateMoviesList(query: IDiscoverQuery) {
+    const discoverMoviesRequest = MovieDBApi.discoverMovie(query);
+    discoverMoviesRequest
+      .then((data) => {
+        this.movies = data.results;
+      })
+      .catch((e: Error) => {
+        this.movies = [];
+        console.warn(e.message);
       });
-      this.movies = discoverMoviesRequest.results;
-    } catch (e) {
-      this.movies = [];
-    }
   }
 }
 </script>
 
 <style scoped lang="scss">
 .movies-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  grid-auto-rows: 231px;
-  row-gap: 20px;
-  column-gap: 20px;
+
+
+  &__main {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-auto-rows: 231px;
+    row-gap: 20px;
+    column-gap: 20px;
+  }
+
+  &__header {
+    padding: 10px;
+    display: grid;
+    grid-auto-flow: column;
+  }
 }
 </style>

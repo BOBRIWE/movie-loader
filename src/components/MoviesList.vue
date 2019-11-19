@@ -3,6 +3,7 @@
     <header class="movies-list__header">
       <YearFilter @onYearSelected="onYearChanged"/>
       <GenresFilter @onGenresChanged="onGenresChanged"/>
+      <KeywordFilter @onSelectedKeywordsChanged="onKeywordsChanged"/>
     </header>
     <main class="movies-list__main">
       <MoviesListCard
@@ -28,8 +29,15 @@ import IPagedResponse from '@/MovieDBApi/IPagedResponse';
 import YearFilter from '@/components/YearFilter.vue';
 import IDiscoverQuery from '@/MovieDBApi/IDiscoverQuery';
 import GenresFilter from '@/components/GenresFilter.vue';
+import KeywordFilter from '@/components/KeywordFilter.vue';
+import IKeyword from '@/MovieDBApi/IKeyword';
 @Component({
-  components: { GenresFilter, YearFilter, MoviesListCard },
+  components: {
+    KeywordFilter,
+    GenresFilter,
+    YearFilter,
+    MoviesListCard,
+  },
 })
 export default class MoviesList extends Vue {
   private movies: IMovie[] = [];
@@ -41,12 +49,22 @@ export default class MoviesList extends Vue {
   }
 
   onYearChanged(newYear: string) {
-    this.queryObj.year = parseInt(newYear, 10);
+    if (newYear === '') {
+      this.queryObj.year = undefined;
+    } else {
+      this.queryObj.year = parseInt(newYear, 10);
+    }
+
     this.updateMoviesList(this.queryObj);
   }
 
   onGenresChanged(genresIds: number[]) {
     this.queryObj.with_genres = genresIds.join('&');
+    this.updateMoviesList(this.queryObj);
+  }
+
+  onKeywordsChanged(keywords: IKeyword[]) {
+    this.queryObj.with_keywords = keywords.map(value => value.id).join('&');
     this.updateMoviesList(this.queryObj);
   }
 

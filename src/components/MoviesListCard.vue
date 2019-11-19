@@ -54,6 +54,7 @@ export default class MoviesListCard extends Vue {
   line-height: 1.2em;
 
   height: fit-content;
+  width: fit-content;
 
   &__description {
     display: grid;

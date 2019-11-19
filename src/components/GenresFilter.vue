@@ -10,7 +10,8 @@
         {{name}}
       </article>
     </section>
-    <select class="genres-filter__select" @change="onGenresSelected">
+    <label for="genres-select">Genres</label><br/>
+    <select id="genres-select" class="genres-filter__select" @change="onGenresSelected">
       <option disabled selected></option>
       <option v-for="genre in genres" :key="genre.id" :value="genre.id">{{genre.name}}</option>
     </select>

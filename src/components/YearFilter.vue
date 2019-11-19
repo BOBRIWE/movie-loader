@@ -1,6 +1,8 @@
 <template>
   <section class="year-filter">
-    <select class="year-filter__select" @change="onYearSelected">
+    <label for="years-select">Years</label><br/>
+    <select id="years-select" class="year-filter__select" @change="onYearSelected">
+      <option selected value="">All</option>
       <option v-for="year in years" :key="year" :value="year">{{year}}</option>
     </select>
   </section>
@@ -29,8 +31,6 @@ export default class YearFilter extends Vue {
       years.push(i);
       i -= 1;
     }
-
-    this.$emit('onYearSelected', curYear);
 
     return {
       years,

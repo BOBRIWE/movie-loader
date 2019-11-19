@@ -1,9 +1,8 @@
 /* eslint camelcase: 0 */
-import IMovie from '@/MovieDBApi/IMovie';
 
-interface IPagedResponse {
+interface IPagedResponse<TResult> {
   page: number
-  results: IMovie[]
+  results: TResult[]
   total_results: number
   total_pages: number
 }

@@ -8,6 +8,8 @@ import IKeyword from '@/MovieDBApi/IKeyword';
 import ISearchKeywordQuery from '@/MovieDBApi/ISearchKeywordQuery';
 import IMovieDetails from '@/MovieDBApi/IMovieDetails';
 import IVideosResponse from '@/MovieDBApi/IVideosResponse';
+import ErrorResponse from '@/MovieDBApi/ErrorResponse';
+import MovieDBStatusCodesEnum from '@/MovieDBApi/MovieDBStatusCodesEnum';
 
 export default class MovieDBApi {
   static async getNowPlaying(): Promise<IPagedResponse<IMovie>> {
@@ -32,7 +34,15 @@ export default class MovieDBApi {
 
   static async discoverMovie(query: IDiscoverQuery): Promise<IPagedResponse<IMovie>> {
     const request = new Request(`/discover/movie/?${QueryString.stringify(query)}`);
-    return request.get<IPagedResponse<IMovie>>();
+    const response = await request.get<IPagedResponse<IMovie>>();
+
+    if (response.results.length === 0) {
+      throw new ErrorResponse({
+        status_message: 'Movies not found!',
+        status_code: MovieDBStatusCodesEnum.ResourceNotFound,
+      });
+    }
+    return response;
   }
 
   static async getGenres(): Promise<IGenresResponse> {

@@ -1,4 +1,6 @@
 import MovieDBApiCredentials from './MovieDBApi/MovieDBApiCredentials';
+import IResponseError from '@/MovieDBApi/IResponseError';
+import ErrorResponse from '@/MovieDBApi/ErrorResponse';
 
 export default class Request {
     private readonly requestPath: string;
@@ -20,7 +22,8 @@ export default class Request {
       );
 
       if (!fetchRequest.ok) {
-        throw new Error(fetchRequest.statusText);
+        const error: IResponseError = await fetchRequest.json();
+        throw new ErrorResponse(error);
       }
 
       return fetchRequest.json();

@@ -1,9 +1,12 @@
 <template>
-  <MovieDetails
-    v-if="movieDetails !== null"
-    :movieDetails="movieDetails"
-    :movieVideos="movieVideos"
-  />
+  <main class="movie">
+    <MovieDetails
+      v-if="movieDetails !== null"
+      :movieDetails="movieDetails"
+      :movieVideos="movieVideos"
+    />
+    <Error :error="error"/>
+  </main>
 </template>
 
 <script lang="ts">
@@ -16,8 +19,9 @@ import IMovieDetails from '@/MovieDBApi/IMovieDetails';
 import MovieDBApi from '@/MovieDBApi/MovieDBApi';
 import MovieDetails from '@/components/MovieDetails.vue';
 import IVideo from '@/MovieDBApi/IVideo';
+import Error from '@/components/Error.vue';
 @Component({
-  components: { MovieDetails },
+  components: { Error, MovieDetails },
 })
 export default class Movie extends Vue {
   @Prop() private id!: string;
@@ -26,8 +30,11 @@ export default class Movie extends Vue {
 
   private movieVideos: IVideo[] = [];
 
+  private error: Error | null = null;
+
   async created() {
     try {
+      this.error = null;
       const movie = await MovieDBApi.getMovieDetails(this.id);
       const videos = await MovieDBApi.getMovieVideos(this.id);
       this.movieDetails = movie;
@@ -35,7 +42,7 @@ export default class Movie extends Vue {
     } catch (e) {
       this.movieDetails = null;
       this.movieVideos = [];
-      console.error(e);
+      this.error = e;
     }
   }
 }

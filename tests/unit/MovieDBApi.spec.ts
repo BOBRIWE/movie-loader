@@ -2,6 +2,9 @@ import nodeFetch from 'node-fetch';
 import Request from '../../src/Request';
 import MovieDBApiCredentials from '@/MovieDBApi/MovieDBApiCredentials';
 import MovieDBApi from '@/MovieDBApi/MovieDBApi';
+import IResponseError from '@/MovieDBApi/IResponseError';
+import MovieDBStatusCodesEnum from '@/MovieDBApi/MovieDBStatusCodesEnum';
+import ErrorResponse from '@/MovieDBApi/ErrorResponse';
 
 describe('MovieDBApi', () => {
   beforeEach(() => {
@@ -25,5 +28,14 @@ describe('MovieDBApi', () => {
     pages.results.forEach((item) => {
       expect(item.genre_ids).toContain(28);
     });
+  });
+
+  it('should throw error on not found movie', async () => {
+    expect.assertions(1);
+    try {
+      const movie = await MovieDBApi.getMovieDetails('10');
+    } catch (e) {
+      expect(<ErrorResponse>e.status_code).toBe(MovieDBStatusCodesEnum.ResourceNotFound);
+    }
   });
 });

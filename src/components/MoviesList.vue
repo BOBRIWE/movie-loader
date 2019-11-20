@@ -11,6 +11,7 @@
         v-bind:key="`card-${movie.id}`"
         v-bind:movie="movie"
       />
+      <Error :error="error"/>
     </main>
   </section>
 </template>
@@ -31,8 +32,10 @@ import IDiscoverQuery from '@/MovieDBApi/IDiscoverQuery';
 import GenresFilter from '@/components/GenresFilter.vue';
 import KeywordFilter from '@/components/KeywordFilter.vue';
 import IKeyword from '@/MovieDBApi/IKeyword';
+import Error from '@/components/Error.vue';
 @Component({
   components: {
+    Error,
     KeywordFilter,
     GenresFilter,
     YearFilter,
@@ -43,6 +46,10 @@ export default class MoviesList extends Vue {
   private movies: IMovie[] = [];
 
   private queryObj: IDiscoverQuery = {};
+
+  private error: Error | null = null;
+
+  private pages: number = 1;
 
   created() {
     this.updateMoviesList(this.queryObj);
@@ -72,11 +79,14 @@ export default class MoviesList extends Vue {
     const discoverMoviesRequest = MovieDBApi.discoverMovie(query);
     discoverMoviesRequest
       .then((data) => {
+        this.error = null;
         this.movies = data.results;
+        this.pages = data.total_pages;
       })
       .catch((e: Error) => {
+        this.error = e;
         this.movies = [];
-        console.warn(e.message);
+        console.log(e);
       });
   }
 }

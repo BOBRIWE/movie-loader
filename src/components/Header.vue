@@ -1,10 +1,15 @@
 <template>
-  <header class="header"></header>
+  <header class="header">
+    <MovieSearch/>
+  </header>
 </template>
 
 <script>
+import MovieSearch from './MovieSearch.vue';
+
 export default {
   name: 'Header',
+  components: { MovieSearch },
 };
 </script>
 
@@ -13,7 +18,7 @@ export default {
 
   .header {
     width: 100%;
-    height: 60px;
+    padding: 30px;
     background-color: $dark100;
   }
 </style>

@@ -10,6 +10,7 @@ import IMovieDetails from '@/MovieDBApi/IMovieDetails';
 import IVideosResponse from '@/MovieDBApi/IVideosResponse';
 import ErrorResponse from '@/MovieDBApi/ErrorResponse';
 import MovieDBStatusCodesEnum from '@/MovieDBApi/MovieDBStatusCodesEnum';
+import ISearchMovieQuery from '@/MovieDBApi/ISearchMovieQuery';
 
 export default class MovieDBApi {
   static async getNowPlaying(): Promise<IPagedResponse<IMovie>> {
@@ -33,7 +34,7 @@ export default class MovieDBApi {
   }
 
   static async discoverMovie(query: IDiscoverQuery): Promise<IPagedResponse<IMovie>> {
-    const request = new Request(`/discover/movie/?${QueryString.stringify(query)}`);
+    const request = new Request(`/discover/movie?${QueryString.stringify(query)}`);
     const response = await request.get<IPagedResponse<IMovie>>();
 
     if (response.results.length === 0) {
@@ -64,5 +65,11 @@ export default class MovieDBApi {
   static async getMovieVideos(movieId: string): Promise<IVideosResponse> {
     const request = new Request(`/movie/${movieId}/videos`);
     return request.get<IVideosResponse>();
+  }
+
+  static async getMovieByName(name: string): Promise<IPagedResponse<IMovie>> {
+    const query: ISearchMovieQuery = { query: name };
+    const request = new Request(`/search/movie?${QueryString.stringify(query)}`);
+    return request.get<IPagedResponse<IMovie>>();
   }
 }

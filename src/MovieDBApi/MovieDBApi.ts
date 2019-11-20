@@ -7,6 +7,7 @@ import IMovie from '@/MovieDBApi/IMovie';
 import IKeyword from '@/MovieDBApi/IKeyword';
 import ISearchKeywordQuery from '@/MovieDBApi/ISearchKeywordQuery';
 import IMovieDetails from '@/MovieDBApi/IMovieDetails';
+import IVideosResponse from '@/MovieDBApi/IVideosResponse';
 
 export default class MovieDBApi {
   static async getNowPlaying(): Promise<IPagedResponse<IMovie>> {
@@ -48,5 +49,10 @@ export default class MovieDBApi {
   static async getMovieDetails(movieId: string): Promise<IMovieDetails> {
     const request = new Request(`/movie/${movieId}`);
     return request.get<IMovieDetails>();
+  }
+
+  static async getMovieVideos(movieId: string): Promise<IVideosResponse> {
+    const request = new Request(`/movie/${movieId}/videos`);
+    return request.get<IVideosResponse>();
   }
 }

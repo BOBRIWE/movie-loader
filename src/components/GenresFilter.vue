@@ -3,18 +3,33 @@
     <section class="genres-filter__selected-genres">
       <article
         class="genres-filter__selected-genre"
-        v-for="name in selectedGenresNames"
-        :key="name"
-        @click="removeGenre(name)"
+        v-for="genre in selectedGenres"
+        :key="genre.name"
+        @click="removeGenre(genre)"
       >
-        {{name}}
+        {{genre.name}}
       </article>
     </section>
     <label for="genres-select">Genres</label><br/>
-    <select id="genres-select" class="genres-filter__select" @change="onGenresSelected">
-      <option disabled selected></option>
-      <option v-for="genre in genres" :key="genre.id" :value="genre.id">{{genre.name}}</option>
-    </select>
+    <section
+      tabindex="0"
+      id="genres-select"
+      class="genres-filter__select"
+      @focusin="onGenresFocusIn"
+      @focusout="onGenresFocusOut"
+    >
+      <article v-if="genresActive" class="genres-filter__container">
+        <article
+          class="genres-filter__genre"
+          v-for="genre in genres"
+          :key="genre.id"
+          :value="genre.id"
+          @click="onGenreSelected(genre)"
+        >
+          {{genre.name}}
+        </article>
+      </article>
+    </section>
   </section>
 </template>
 
@@ -22,7 +37,7 @@
 import {
   Component,
   Prop,
-  Vue,
+  Vue, Watch,
 } from 'vue-property-decorator';
 import MovieDBApi from '@/MovieDBApi/MovieDBApi';
 import IGenre from '@/MovieDBApi/IGenre';
@@ -31,38 +46,45 @@ import IGenre from '@/MovieDBApi/IGenre';
 export default class GenresFilter extends Vue {
   private genres: IGenre[] = [];
 
-  private selectedGenresIds: number[] = [];
+  private selectedGenres: IGenre[] = [];
 
-  private selectedGenresNames: string[] = [];
+  private genresActive: boolean = false;
 
   async created() {
     const genres = await MovieDBApi.getGenres();
     this.genres = genres.genres;
   }
 
-  removeGenre(name: string) {
-    const names = this.selectedGenresNames;
-    const ids = this.selectedGenresIds;
+  removeGenre(genreToRemove: IGenre) {
+    const selected = this.selectedGenres;
 
-    const i = names.indexOf(name);
+    const i = selected.indexOf(genreToRemove);
     if (i > -1) {
-      names.splice(i, 1);
-      ids.splice(i, 1);
+      selected.splice(i, 1);
     }
 
-    this.selectedGenresIds = ids;
-    this.selectedGenresNames = names;
-    this.$emit('onGenresChanged', ids);
+    this.selectedGenres = selected;
   }
 
-  onGenresSelected(e: Event) {
-    const { value } = e.target as HTMLInputElement;
-    const id: number = parseInt(value, 10);
-    const genre = this.genres.find(i => i.id === id) as IGenre;
+  onGenreSelected(selectedGenre: IGenre) {
+    if (this.selectedGenres.indexOf(selectedGenre) === -1) {
+      const newSelected = this.selectedGenres;
+      newSelected.push(selectedGenre);
+      this.selectedGenres = newSelected;
+    }
+  }
 
-    this.selectedGenresIds.push(id);
-    this.selectedGenresNames.push(genre.name);
-    this.$emit('onGenresChanged', this.selectedGenresIds);
+  @Watch('selectedGenres')
+  onSelectedKeywordsChanged(val: IGenre[], oldVal: IGenre[]) {
+    this.$emit('onSelectedGenresChanged', val);
+  }
+
+  onGenresFocusIn() {
+    this.genresActive = true;
+  }
+
+  onGenresFocusOut() {
+    this.genresActive = false;
   }
 }
 </script>
@@ -77,15 +99,31 @@ export default class GenresFilter extends Vue {
     width: 100px;
     height: 40px;
     border-radius: 5px;
+    border: 1px solid $dark100;
     background-color: $white100;
+    position: relative;
+  }
+
+  &__container {
+    position: absolute;
+    border: 1px solid $dark100;
+    top: 40px;
+    background-color: $white100;
+  }
+
+  &__genre {
+    &:hover {
+      background-color: $gray100;
+      cursor: pointer;
+    }
   }
 
   &__selected-genre {
     background-color: $gray100;
     border-radius: 5px;
-    padding: 5px;
     position: relative;
     width: fit-content;
+    padding: 5px 25px 5px 5px;
 
     &:hover {
       cursor: pointer;
@@ -95,8 +133,8 @@ export default class GenresFilter extends Vue {
     &:after {
       content: 'x';
       position: absolute;
-      right: 0;
-      top: 0;
+      right: 10px;
+      color: $white100;
     }
   }
 }

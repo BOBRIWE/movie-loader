@@ -12,8 +12,14 @@
     </section>
     <section class="keyword-filter__main">
       <label for="keyword-input">Keywords</label><br/>
-      <input class="keyword-filter__input" id="keyword-input" type="text" @input="onInputUpdate">
-      <article class="keyword-filter__possible-keywords">
+      <input
+        class="keyword-filter__input"
+        id="keyword-input" type="text"
+        @input="onInputUpdate"
+        @focusin="inputFocusIn"
+        @focusout="inputFocusOut"
+      >
+      <article v-if="inputFocused" class="keyword-filter__possible-keywords">
         <div
           class="keyword-filter__keyword"
           v-for="keyword in keywords"
@@ -41,6 +47,8 @@ export default class KeywordFilter extends Vue {
   private keywords: IKeyword[] = [];
 
   private selectedKeywords: IKeyword[] = [];
+
+  private inputFocused: boolean = false;
 
   onKeywordSelected(e: Event) {
     const { value } = e.target as HTMLInputElement;
@@ -85,9 +93,18 @@ export default class KeywordFilter extends Vue {
       });
   }
 
+  inputFocusIn() {
+    this.inputFocused = true;
+  }
+
+  inputFocusOut() {
+    setTimeout(() => {
+      this.inputFocused = false;
+    }, 100);
+  }
+
   @Watch('selectedKeywords')
   onSelectedKeywordsChanged(val: IKeyword[], oldVal: IKeyword[]) {
-    console.log(val);
     this.$emit('onSelectedKeywordsChanged', val);
   }
 }
@@ -140,7 +157,7 @@ export default class KeywordFilter extends Vue {
 
   &__possible-keywords {
     position: absolute;
-    top: 40px;
+    top: 60px;
     background-color: $white100;
     border: 1px solid black;
     &:empty {

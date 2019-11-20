@@ -2,7 +2,7 @@
   <section class="movies-list">
     <header class="movies-list__header">
       <YearFilter @onYearSelected="onYearChanged"/>
-      <GenresFilter @onGenresChanged="onGenresChanged"/>
+      <GenresFilter @onSelectedGenresChanged="onGenresChanged"/>
       <KeywordFilter @onSelectedKeywordsChanged="onKeywordsChanged"/>
       <Pagination
         v-if="movies.length !== 0"
@@ -38,6 +38,7 @@ import KeywordFilter from '@/components/KeywordFilter.vue';
 import IKeyword from '@/MovieDBApi/IKeyword';
 import Error from '@/components/Error.vue';
 import Pagination from '@/components/Pagination.vue';
+import IGenre from '@/MovieDBApi/IGenre';
 @Component({
   components: {
     Pagination,
@@ -71,8 +72,8 @@ export default class MoviesList extends Vue {
     this.updateMoviesList(this.queryObj);
   }
 
-  onGenresChanged(genresIds: number[]) {
-    this.queryObj.with_genres = genresIds.join('&');
+  onGenresChanged(genres: IGenre[]) {
+    this.queryObj.with_genres = genres.map(value => value.id).join('&');
     this.updateMoviesList(this.queryObj);
   }
 

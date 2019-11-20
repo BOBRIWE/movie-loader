@@ -1,7 +1,14 @@
 <template>
   <section class="pagination">
-    <label for="pagination">Page Selection</label>
-    <input id="pagination" class="pagination" type="number" @input="onPaginationInput">
+    <label for="pagination">Page Selection</label><br/>
+    <input
+      id="pagination"
+      class="pagination__input"
+      type="number"
+      min="1"
+      :max="pages"
+      value="1"
+      @input="onPaginationInput">
   </section>
 </template>
 
@@ -14,15 +21,30 @@ import {
 
 @Component
 export default class Pagination extends Vue {
-  @Prop() private pages!: string;
+  @Prop() private pages!: number;
 
   onPaginationInput(e: Event) {
     const { value } = e.target as HTMLInputElement;
-    this.$emit('onPaginationInput', value);
+    const nValue = parseInt(value, 10);
+    if (nValue > this.pages || nValue < 1) {
+      console.log('hit');
+      return;
+    }
+    this.$emit('onPaginationInput', nValue);
   }
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import "../scss/variables";
 
+.pagination {
+  &__input {
+    width: 100px;
+    height: 40px;
+    border-radius: 5px;
+    background-color: $white100;
+    border: 1px solid $gray100;
+  }
+}
 </style>

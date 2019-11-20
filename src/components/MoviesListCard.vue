@@ -7,7 +7,7 @@
       <header class="movie-list-card__title">{{ shortenTitle }}</header>
       <p class="movie-list-card__overview">{{ shortenOverview }}</p>
       <footer class="movie-list-card__extra"></footer>
-      <a class="movie-list-card__movie-details" :href="movieLink">See details...</a>
+      <a target="_blank" class="movie-list-card__movie-details" :href="movieLink">See details...</a>
     </section>
   </article>
 </template>

@@ -4,6 +4,10 @@
       <YearFilter @onYearSelected="onYearChanged"/>
       <GenresFilter @onGenresChanged="onGenresChanged"/>
       <KeywordFilter @onSelectedKeywordsChanged="onKeywordsChanged"/>
+      <Pagination
+        v-if="movies.length !== 0"
+        :pages="pages"
+        @onPaginationInput="onPaginationChanged"/>
     </header>
     <main class="movies-list__main">
       <MoviesListCard
@@ -33,8 +37,10 @@ import GenresFilter from '@/components/GenresFilter.vue';
 import KeywordFilter from '@/components/KeywordFilter.vue';
 import IKeyword from '@/MovieDBApi/IKeyword';
 import Error from '@/components/Error.vue';
+import Pagination from '@/components/Pagination.vue';
 @Component({
   components: {
+    Pagination,
     Error,
     KeywordFilter,
     GenresFilter,
@@ -75,6 +81,11 @@ export default class MoviesList extends Vue {
     this.updateMoviesList(this.queryObj);
   }
 
+  onPaginationChanged(page: number) {
+    this.queryObj.page = page;
+    this.updateMoviesList(this.queryObj);
+  }
+
   updateMoviesList(query: IDiscoverQuery) {
     const discoverMoviesRequest = MovieDBApi.discoverMovie(query);
     discoverMoviesRequest
@@ -86,7 +97,7 @@ export default class MoviesList extends Vue {
       .catch((e: Error) => {
         this.error = e;
         this.movies = [];
-        console.log(e);
+        this.queryObj.page = 1;
       });
   }
 }

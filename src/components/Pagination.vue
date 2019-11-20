@@ -27,7 +27,6 @@ export default class Pagination extends Vue {
     const { value } = e.target as HTMLInputElement;
     const nValue = parseInt(value, 10);
     if (nValue > this.pages || nValue < 1) {
-      console.log('hit');
       return;
     }
     this.$emit('onPaginationInput', nValue);
